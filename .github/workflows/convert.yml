@@ -1,0 +1,38 @@
+name: Convert Shadowrocket to Clash
+
+on:
+  # 定时任务默认关闭，如果需要每天凌晨1点自动运行，请取消下面3行注释
+  # schedule:
+  #   - cron: "0 1 * * *"     # 每天凌晨1点（UTC）运行
+
+  workflow_dispatch:          # 支持手动触发
+  push:
+    branches:
+      - main
+
+jobs:
+  convert:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.11
+
+      - name: Install dependencies
+        run: pip install requests
+
+      - name: Run conversion script
+        run: python convert.py
+
+      - name: Commit and push changes
+        run: |
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git add clash_rules.yaml
+          git commit -m "Auto update clash rules $(date -u '+%Y-%m-%d %H:%M:%S UTC')" || echo "No changes"
+          git push
