@@ -1,0 +1,26 @@
+allow-lan: true
+external-controller: 127.0.0.1:9090
+log-level: info
+mode: rule
+port: 7890
+proxies: []
+proxy-groups:
+- name: 🚀 节点选择
+  proxies:
+  - ♻️ 自动选择
+  - DIRECT
+  type: select
+- interval: 300
+  name: ♻️ 自动选择
+  proxies:
+  - DIRECT
+  type: url-test
+  url: http://www.gstatic.com/generate_204
+redir-port: 7892
+rules:
+- DOMAIN-SUFFIX,local,DIRECT
+- DOMAIN-SUFFIX,qq.com,DIRECT
+- DOMAIN-SUFFIX,google.com,🚀 节点选择
+- GEOIP,CN,DIRECT
+- MATCH,🚀 节点选择
+socks-port: 7891
