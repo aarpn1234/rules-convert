@@ -1,19 +1,15 @@
-name: Generate Clash Config
+name: Convert SR Conf to Multi-platform Rules
 
 on:
   workflow_dispatch:
-    inputs:
-      mode:
-        description: 'Clash 模式 (rule/global)'
-        required: false
-        default: 'rule'
+  schedule:
+    - cron: '0 1 * * *'  # 每天 1 点 UTC 执行
 
 jobs:
-  generate:
+  convert:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v3
 
       - name: Set up Python
         uses: actions/setup-python@v4
@@ -21,17 +17,15 @@ jobs:
           python-version: '3.11'
 
       - name: Install dependencies
-        run: pip install pyyaml
+        run: pip install pyyaml requests
 
-      - name: Generate clash_config.yaml
-        run: python generate.py
-        env:
-          RULE_MODE: ${{ github.event.inputs.mode }}
+      - name: Run conversion script
+        run: python parse_conf.py
 
-      - name: Commit and push
+      - name: Commit results
         run: |
           git config user.name github-actions
           git config user.email github-actions@github.com
-          git add clash_config.yaml
-          git commit -m "🔁 Auto update Clash config (${{ github.event.inputs.mode || 'rule' }})"
-          git push
+          git add output/
+          git commit -m "Auto convert sr_cnip_ad.conf to multi-platform rules"
+          git push || echo "No changes to commit"
