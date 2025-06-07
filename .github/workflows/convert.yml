@@ -19,17 +19,13 @@ jobs:
       - name: Install dependencies
         run: pip install pyyaml requests
 
-      - name: Run conversion script to generate clash.yaml
-        run: python parse_conf.py  # 该脚本生成 clash.yaml 并存入 output 文件夹
-
-      - name: Convert new clash.yaml to scconf.ini
-        run: python scripts/convert_to_scconf.py output/clash.yaml config/scconf.ini
+      - name: Run conversion script
+        run: python parse_conf.py
 
       - name: Commit results
         run: |
           git config user.name github-actions
           git config user.email github-actions@github.com
           git add output/
-          git add config/scconf.ini
-          git commit -m "Auto convert SR Conf & Clash YAML to Subconverter config"
+          git commit -m "Auto convert sr_cnip_ad.conf to multi-platform rules"
           git push || echo "No changes to commit"
